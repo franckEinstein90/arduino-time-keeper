@@ -3,11 +3,11 @@
 ****************************************************************************************/
 
 
-int secondLightPin = 2; 
+int secondsLightPin = 2; 
 int seconds = 0; 
 
 int halfTimeLightPin = 12; 
-int totalTimePeriodMinutes = 20; 
+int totalTimePeriodMinutes = 10; 
 int minutes = 0; 
 
 
@@ -57,11 +57,12 @@ class TimeSignal {
 };
 
 
-TimeSignal*  half; 
+TimeSignal*  halfSignal; 
+TimeSignal*  secondSignal; 
 void setup() {
 
-  half = new TimeSignal(halfTimeLightPin); 
-  pinMode(2, OUTPUT);
+  halfSignal = new TimeSignal(halfTimeLightPin); 
+  secondSignal = new TimeSignal(secondsLightPin); 
   pinMode(9, OUTPUT);
   digitalWrite(7, HIGH);   // turn the LED on (HIGH is the voltage level)
   digitalWrite(9, HIGH);   // turn the LED on (HIGH is the voltage level)
@@ -75,7 +76,7 @@ void loop() {
   digitalWrite( 2, !( seconds % 2 ) ? HIGH : LOW );  
   
   if( minutes == (int)( totalTimePeriodMinutes / 2 ) ) {
-    half->flip();  
+    halfSignal->flip();  
     minutes = 0;   
   } 
   
