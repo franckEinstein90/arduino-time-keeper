@@ -1,88 +1,100 @@
 /***************************************************************************************
- * FranckEinstein90
+   FranckEinstein90
 ****************************************************************************************/
+#include "Clock.h"
+#include "TimeSignal.h"
+
+TimeSignal::TimeSignal( byte pin, Clock* clock )
+{
+  this->pin = pin ;
+  init( ) ;
+}
+
+void TimeSignal::init( )
+{
+  pinMode( this->pin, OUTPUT ) ;
+  this->on( ) ;
+}
+
+void TimeSignal::flip( )
+{
+  if ( this->state == false )
+  {
+    this->on( ) ;
+    return ;
+  }
+  this->off( );
+}
+
+void TimeSignal::on( )
+{
+  this->state = true ;
+  digitalWrite( this->pin, HIGH ) ;
+}
+
+void TimeSignal::off( )
+{
+  this->state = false ;
+  digitalWrite( this->pin, LOW ) ;
+}
+
+TimeSignal::~TimeSignal( )
+{
+  this->off( ) ;
+}
 
 
-int secondsLightPin = 2; 
-int seconds = 0; 
 
-int halfTimeLightPin = 12; 
-int totalTimePeriodMinutes = 10; 
-int minutes = 0; 
+int quarterTimeLightPin = 3 ;
+int halfTimeLightPin = 12 ;
+int secondsLightPin = 2 ;
+int totalTimePeriodMinutes = 100 ;
+Clock* clock = new Clock( totalTimePeriodMinutes * 60 ) ;
 
+TimeSignal*  halfSignal ;
+TimeSignal*  quarterSignal ;
+TimeSignal*  secondSignal ;
 
-
-class TimeSignal {
-
-  private: 
-    byte pin; 
-    bool state;
-       
-  public: 
-  
-    TimeSignal( byte pin )
-    {
-      this->pin = pin; 
-      init(); 
-    }
-
-    void init()
-    {
-      pinMode(this->pin, OUTPUT); 
-      this->on(); 
-    }
-
-    void flip()
-    {
-      if(this->state == false){
-        this->on(); 
-        return ;
-      }
-      this->off(); 
-    }
-
-    private: 
-
-      void on()
-      {
-        this->state = true; 
-        digitalWrite(this->pin, HIGH);
-      }
-    
-      void off()
-      {
-        this->state = false; 
-        digitalWrite(this->pin, LOW); 
-      }
-};
-
-
-TimeSignal*  halfSignal; 
-TimeSignal*  secondSignal; 
 void setup() {
 
-  halfSignal = new TimeSignal(halfTimeLightPin); 
-  secondSignal = new TimeSignal(secondsLightPin); 
-  pinMode(9, OUTPUT);
-  digitalWrite(7, HIGH);   // turn the LED on (HIGH is the voltage level)
-  digitalWrite(9, HIGH);   // turn the LED on (HIGH is the voltage level)
-  digitalWrite(8, HIGH);   // turn the LED on (HIGH is the voltage level)
- 
+  halfSignal    = new TimeSignal( halfTimeLightPin, clock ) ;
+  quarterSignal = new TimeSignal( 3 );
+  secondSignal  = new TimeSignal( secondsLightPin );
+
 }
 
 // the loop function runs over and over again forever
-void loop() {
-  
-  digitalWrite( 2, !( seconds % 2 ) ? HIGH : LOW );  
-  
-  if( minutes == (int)( totalTimePeriodMinutes / 2 ) ) {
-    halfSignal->flip();  
-    minutes = 0;   
-  } 
-  
-  delay(1000);            
-  seconds += 1; 
-  if(seconds % 60 == 0) {
-    minutes += 1; 
+void loop( ) {
+
+  if ( ! clock->isRunning( ) ) {
+
+    if ( halfSignal ) {
+      delete halfSignal ;
+      halfSignal = NULL ;
+    }
+
+    if ( quarterSignal ) {
+      delete quarterSignal ;
+      quarterSignal = NULL ;
+    }
+
+    if ( secondSignal ) {
+      delete secondSignal ;
+      secondSignal = NULL ;
+    }
+
+    return ;
+
   }
- }
+
+  secondSignal->flip( );
+
+  if ( (! clock->firstHalf( ) ) && halfSignal->isOn( ) ) {
+    halfSignal->flip( ) ;
+    clock->minuteCounter = 0 ;
+  }
+
+  delay( 1000 ) ;
+  clock->tick( ) ;
+
+}
