@@ -1,19 +1,7 @@
 #ifndef CLOCK_H
 #define CLOCK_H
+#include "Ticker.h"
 #include <Arduino.h>
-
-
-class Ticker {
-
-  public: 
-    unsigned long lastTick = 0 ;
-    void tick() {
-      lastTick += 1 ;
-    }
-
-};
-
-
 class Clock {
 
  private: 
@@ -28,7 +16,7 @@ class Clock {
 
     }; 
 
-    boolean isRunning( ){
+    bool isRunning( ){
       return ticker.lastTick < durationSeconds ; 
     }
  

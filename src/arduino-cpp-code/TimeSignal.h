@@ -1,8 +1,6 @@
 #ifndef TIME_SIGNAL_H
 #define TIME_SIGNAL_H 
-#include <Arduino.h>
 #include "Clock.h"
-
 
 
 class TimeSignal {
@@ -18,12 +16,12 @@ class TimeSignal {
   
     TimeSignal( byte pin, Clock* clock = nullptr ) ;
     
-    boolean isOn( )
+    bool isOn( )
     {
       return state ;
     } ; 
 
-    boolean isOff( )
+    bool isOff( )
     {
       return !state ;
     } ; 
